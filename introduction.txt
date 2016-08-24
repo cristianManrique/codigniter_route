@@ -1,0 +1,131 @@
+ 1 Removing the  default route index.php
+ ------------------------
+ 
+ Creat this code to your .htaccess file to your root of your project.
+ 
+ where ?
+ --------
+ 
+ myFolderName/ 
+–––– application/ 
+–––– assets/ 
+–––– system/ 
+–––– user_guide/ 
+---- .htaccess <-------------------------
+–––– index.php 
+–––– license.txt
+
+
+add this in .htaccess:
+---------
+<IfModule mod_rewrite.c>
+# Turn on URL rewriting
+RewriteEngine On
+
+# If your website begins from a folder e.g localhost/my_project then 
+# you have to change it to: RewriteBase /my_project/
+# If your site begins from the root e.g. example.local/ then
+# let it as it is
+RewriteBase /
+
+# Protect application and system files from being viewed when the index.php is missing
+RewriteCond $1 ^(application|system|private|logs)
+
+# Rewrite to index.php/access_denied/URL
+RewriteRule ^(.*)$ index.php/access_denied/$1 [PT,L]
+
+# Allow these directories and files to be displayed directly:
+RewriteCond $1 ^(index\.php|robots\.txt|favicon\.ico|public|assets|css|js|images)
+
+# No rewriting
+RewriteRule ^(.*)$ - [PT,L]
+
+# Rewrite to index.php/URL
+RewriteRule ^(.*)$ index.php/$1 [PT,L]
+</IfModule>
+
+
+
+2  go to application/config/config.php
+-------------------------------------
+$config['index_page'] = 'index.php';    to  $config['index_page'] = '';
+
+
+
+3  in .htaccess don't forget to change your RewriteBase with the name of myFolderName:
+------------------------------------------------------------
+RewriteBase /      to     RewriteBase /myFolderName/
+
+
+
+4   in config.php , auto found your folder form any server
+------------------------------------------
+$config['base_url'] = 'index.php';
+
+to:
+
+$config['base_url'] = "http://".$_SERVER['HTTP_HOST'];
+$config['base_url'] .= preg_replace('@/+$@','',dirname($_SERVER['SCRIPT_NAME'])).'/';
+
+
+
+5  Now create css and js folder in your project root directory in myFolderName.
+-------------------------------------------------------------
+ **********first creat folder assets******
+ 
+ myFolderName/ 
+–––– assets/ <-------------------------
+
+Copy your .css file in CSS folder and copy .js file in JS folder.
+
+ myFolderName/ 
+–––– assets/css  &  assets/js
+
+
+ 6  access to base_url
+ ----------------------
+For base_url() function you must load URL helper in your controller’s constructor
+
+//Loading url helper 
+add $this->load->helper('url'); in a parent construct
+ 
+ ex:
+ 
+class MyClass extends CI_Controller {
+    
+    function __construct() {
+        parent::__construct();
+
+        // Load url helper
+        $this->load->helper('url');
+        ---------------------------
+    }
+    
+    
+    public function index(){
+        
+        $this->load->view('myClass_view');
+    }
+}
+
+
+ 7  function in view, Now you can use base_url()
+-----------------------------------------
+<head>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('application/views/css/styles.css'); ?>">
+<script type='text/javascript' src="<?php echo base_url('application/views/js/jquery-latest.min.js'); ?>"
+</head>
+
+
+8 Now have fun creat routes, controller and views!!
+----------------------------------------------------
+ex in routes.php
+
+$route['default_controller'] = 'welcome';
+$route['route1'] = 'route1';
+$route['route2'] = 'route2';
+
+ex of controller route1
+
+
+
